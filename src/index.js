@@ -14,6 +14,6 @@ app.post('/sign-up',(req,res)=>{
  console.log(req.body);
 })
 
-app.listen(port,()=>{
+app.listen(process.env.PORT || port,()=>{
     console.log("Meditation-community backend is listening on port: "+port);
 })
