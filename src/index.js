@@ -11,7 +11,7 @@ const session_secret="meditation-community-app";
 const app = express();
 app.use(cors({
     credentials:true,
-    origin:"local-origin,remote-origin,http://meditation-community-frontend.herokuapp.com/,http://localhost:3000/"
+    origin:"local-origin,remote-origin"
 }));//for handling cors
 app.use(express.json());//for handling post request bodies
 app.use(session({
@@ -49,8 +49,6 @@ db.once('open', function () {
             bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
                 // Store hash in your password DB.
                 userObj.password = hash;
-                //make user status online
-                userObj.status="online";
                 //store it to database;
                 const newUser = new User(userObj);
                 newUser.save((err, user) => {
@@ -85,8 +83,6 @@ db.once('open', function () {
             bcrypt.compare(req.body.password, userDoc.password)
                 .then((result) => {
                     if (result) {
-                        userDoc.status="online";
-                        userDoc.save();
                         req.session.userId=userDoc._id;
                         res.send({ status: 'ok' });
                     } else {
@@ -96,20 +92,6 @@ db.once('open', function () {
         } else {
             res.status(400).send({ status: 'failed' });
         }
-
-        app.get('/signout',async (req,res)=>{
-            if(!isNullOrUndefined(req.session)){
-                //make variable offline
-                const userDoc = await User.findOne({ _id: req.session.userId }).exec();
-                userDoc.status="offline";
-                userDoc.save();
-                req.session.destroy(()=>{
-                    res.sendStatus(200);
-                });
-            }else{
-                res.sendStatus(200);
-            }
-        })
 
     })
 
@@ -124,9 +106,15 @@ app.get('/', (req, res) => {
     res.send({ name: "mayur", fatherName: "machindra" });
 })
 
-
-
-app.get('/userinfo',)
+app.get('/signout',(req,res)=>{
+    if(!isNullOrUndefined(req.session)){
+        req.session.destroy(()=>{
+            res.sendStatus(200);
+        });
+    }else{
+        res.sendStatus(200);
+    }
+})
 const isNullOrUndefined=(value)=>{
     if(value===null || value===undefined){
         return true;
