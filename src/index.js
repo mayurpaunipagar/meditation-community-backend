@@ -11,7 +11,7 @@ const session_secret="meditation-community-app";
 const app = express();
 app.use(cors({
     credentials:true,
-    origin:"local-origin,remote-origin"
+    origin:"https://meditation-community-frontend.herokuapp.com/"
 }));//for handling cors
 app.use(express.json());//for handling post request bodies
 app.use(session({
